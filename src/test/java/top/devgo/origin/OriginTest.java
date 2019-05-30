@@ -7,7 +7,7 @@ public class OriginTest {
 
 
     public static void main(String[] args) {
-        Origin.start();
+        Origin.start("top.devgo.origin");
 
         TestComposition comp = (TestComposition) Origin.get("testComposition");
         TestComposition.TestBeanA beanA = (TestComposition.TestBeanA) Origin.get("testBeanA");

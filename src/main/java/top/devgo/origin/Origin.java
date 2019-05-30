@@ -3,6 +3,9 @@ package top.devgo.origin;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ConfigurationBuilder;
 import sun.misc.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -29,19 +32,16 @@ public final class Origin {
     private static Map<String, Object> beans = new HashMap<>();
     private static Map<String, Class<?>> loadedClasses = new HashMap<>();
 
-    public static void start() {
-        //todo get all classes
-//        Paths.get(System.getProperty("user.dir"))
-//        try {
-//                Stream.of(new File(oClassLoader.getResource("").getPath()).listFiles())
-//                    .flatMap(file -> file.listFiles() == null ?
-//                            Stream.of(file) :
-//                            Stream.of(file.listFiles()))
-//                    .forEach(System.out::println);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        init("top.devgo.origin.TestComposition");
+    public static void start(String... scanPackages) {
+        /*
+        get all classes, [see] https://stackoverflow.com/questions/520328/can-you-find-all-classes-in-a-package-using-reflection
+        */
+        Reflections reflections = new Reflections(new ConfigurationBuilder().forPackages(scanPackages)
+                .setScanners(new SubTypesScanner(false)).useParallelExecutor());
+
+        Set<Class<?>> allClasses = reflections.getSubTypesOf(Object.class);
+        allClasses.stream().map(Class::getName).filter(c -> !c.contains("$")).forEach(Origin::init);//排除内部类 init的时候内部类已经处理了
+
 
         doProxy();
 
