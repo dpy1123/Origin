@@ -17,6 +17,23 @@ public class TestComposition {
     @Solid
     private TestBeanA testBeanA;
 
+    public Object adjust2(Method method, Object obj, Object... args){
+        log.info(String.format("[%s] before 222", this.getClass().getName()));
+
+        Object result = null;
+        try {
+            result = method.invoke(obj, args);
+            result = "[changed 222]"+result;
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        log.info(String.format("[%s] adjust 222: %s", this.getClass().getName(), result));
+
+        log.info(String.format("[%s] after 222", this.getClass().getName()));
+        return result;
+    }
+
+    @Adjustment(target = "testComposition#adjust2")
     public Object adjust(Method method, Object obj, Object... args){
         log.info(String.format("[%s] before", this.getClass().getName()));
 

@@ -54,8 +54,10 @@ public final class Origin {
             for (Field d : v.getDeclaredFields()) {
                 if (d.isAnnotationPresent(Solid.class)) {
                     d.setAccessible(true);
+                    String solidName = d.getAnnotation(Solid.class).name();
+                    String valueName = "".equals(solidName) ? getBeanName(d.getType()) : solidName;
                     try {
-                        d.set(beans.get(getBeanName(v)), beans.get(d.getName()));
+                        d.set(beans.get(getBeanName(v)), beans.get(valueName));
                     } catch (IllegalAccessException e) {
                         log.error("", e);
                     }
@@ -67,7 +69,7 @@ public final class Origin {
     private static void doProxy() {
         for (Class<?> cls  : loadedClasses.values()) {
 
-            Set<String> adjustPoints = Stream.of(cls.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Adjustment.class))
+            Set<String> adjustPoints = Stream.of(cls.getMethods()).filter(m -> m.isAnnotationPresent(Adjustment.class))
                     .map(Method::getName).collect(Collectors.toSet());
 
             if (!adjustPoints.isEmpty()){
@@ -90,8 +92,7 @@ public final class Origin {
                         if (adjustInstance == null)
                             return proceed.invoke(self, args);
 
-                        Method adjustMethod = adjustInstance.getClass().getDeclaredMethod(target.split("#")[1], Method.class, Object.class, Object[].class);
-
+                        Method adjustMethod = adjustInstance.getClass().getMethod(target.split("#")[1], Method.class, Object.class, Object[].class);
                         return adjustMethod.invoke(adjustInstance, proceed, self, args);
                     });
 
@@ -121,8 +122,9 @@ public final class Origin {
         }
     }
 
-    private static String getBeanName(Class cls) {
-        return cls.getSimpleName().substring(0, 1).toLowerCase() + cls.getSimpleName().substring(1);
+    private static String getBeanName(Class<?> cls) {
+        String name = cls.getAnnotation(Composition.class).name();
+        return "".equals(name) ? cls.getSimpleName().substring(0, 1).toLowerCase() + cls.getSimpleName().substring(1) : name;
     }
 
 
