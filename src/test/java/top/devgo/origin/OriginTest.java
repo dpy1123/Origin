@@ -16,6 +16,12 @@ public class OriginTest {
         log.info(comp.toString());
         log.info(comp.getTestBeanA().getName());
         log.info(beanA.doSth());
+
+        log.info("-------------");
+        log.info(beanA.doSth2());
+
+        log.info("-------------");
+        log.info(beanA.test());
     }
 
 
