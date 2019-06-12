@@ -10,7 +10,8 @@
 * 没有著名的"this调用事务不生效"问题，使用更符合直觉
 
 
-#### use
+#### usage
 测试入口是test包下的OriginTest#main  
+
 
 欢迎PR！
